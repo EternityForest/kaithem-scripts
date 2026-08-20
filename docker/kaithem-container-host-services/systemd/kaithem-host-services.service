@@ -1,0 +1,22 @@
+[Unit]
+Description=Kaithem host services (PAM over per-user UDS)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/kaithem-host-services serve
+Restart=on-failure
+RestartSec=2
+
+# Hardening: this is a per-user service, so it only ever sees the calling
+# user's credentials. We still lock things down.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+# UDS lives under XDG_RUNTIME_DIR (typically /run/user/<uid>).
+# We need write access there for the socket file.
+BindReadOnlyPaths=-
+
+[Install]
+WantedBy=default.target
