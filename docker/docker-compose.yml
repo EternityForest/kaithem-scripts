@@ -1,0 +1,49 @@
+services:
+  kaithem:
+    image: kaithemautomation/kaithem
+    privileged: true
+
+    build:
+      context: ..
+      dockerfile: docker/kaithem-image/Dockerfile
+
+    user: "${KUID}:${KGID}"
+    environment:
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+      - PIPEWIRE_REMOTE=pipewire-0
+      - USER=${KUSER}
+      - HOME=/home/${KUSER}
+      - LOGNAME=${KUSER}
+
+    volumes:
+      - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
+      - $HOME:/home/$KUSER
+      # This is for kaithem's system login based authentication
+      - /etc/passwd:/etc/passwd:ro
+      - /dev:/dev
+
+      - /var/lib/sss/pipes:/var/lib/sss/pipes:ro
+
+      # Use the host certificate bundle so we don't have to keep
+      # updating the bundle
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+
+    # devices:
+    #   - /dev/dri:/dev/dri  # For GPU acceleration
+
+    network_mode: host
+
+
+  # matter:    
+  #   image: ghcr.io/matter-js/python-matter-server:8.1.2
+  #   volumes:
+  #     - $HOME/kaithem/python-matter-server:/data
+  #     - /run/dbus:/run/dbus:ro
+        # - /etc/ssl/certs:/etc/ssl/certs:ro
+        # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
+  #   network_mode: host
+  #   security_opt:
+  #     - apparmor:unconfined
+  #   user: "${KUID}:${KGID}"

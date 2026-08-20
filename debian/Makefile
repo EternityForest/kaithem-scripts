@@ -108,17 +108,23 @@ user-restart-kaithem: # Get the status of the running kaithem instance
 
 
 # gstreamer1.0-tools is needed for gst-launch dummy sources
+# build-essential python3-dev are needed for some python packages to work
 
-
+#  libasound2-dev and   libjack-jackd2-dev is for python rtmidi
 .PHONY: root-install-system-dependencies
 root-install-system-dependencies: # Install non-python libraries using apt
-	@sudo apt install -y mpv lm-sensors python3-gst-1.0  gstreamer1.0-plugins-good  gstreamer1.0-plugins-bad gstreamer1.0-tools swh-plugins  tap-plugins  caps   gstreamer1.0-plugins-ugly libfluidsynth3 gstreamer1.0-pocketsphinx x42-plugins gstreamer1.0-opencv  gstreamer1.0-vaapi gstreamer1.0-pipewire
-
+	@sudo apt install -y python3 mpv lm-sensors python3-gst-1.0 \
+	gstreamer1.0-plugins-good  gstreamer1.0-plugins-bad \
+	gstreamer1.0-tools swh-plugins  tap-plugins  caps  \
+	gstreamer1.0-plugins-ugly libfluidsynth3 \
+	gstreamer1.0-pocketsphinx x42-plugins gstreamer1.0-opencv \
+	gstreamer1.0-vaapi gstreamer1.0-pipewire build-essential \
+	python3-dev  libasound2-dev  libjack-jackd2-dev pipewire-jack
 
 .PHONY: user-install-kaithem
 user-install-kaithem: # Install the Kaithem python package itself
 	bash ./scripts/get-uv.sh
-	@/home/$(USER)/.local/bin/uv tool install --force kaithem
+	@uv tool install --force kaithem
 
 .PHONY: root-use-pipewire-jack
 root-use-pipewire-jack: # Make JACK clients work with pipewire
