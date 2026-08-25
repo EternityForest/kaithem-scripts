@@ -1,7 +1,14 @@
+
+# Run with export KUID=$UID KGID=$GID KUSER=$USER; sudo -E docker compose up
 services:
   kaithem:
     image: kaithemautomation/kaithem
     privileged: true
+
+    cap_add:
+      - SYS_NICE
+    ulimits:
+      rtprio: 99
 
     build:
       context: ..
@@ -9,31 +16,43 @@ services:
 
     user: "${KUID}:${KGID}"
     environment:
+      - DISPLAY=${DISPLAY:-:0}
       - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
       - PIPEWIRE_REMOTE=pipewire-0
       - USER=${KUSER}
       - HOME=/home/${KUSER}
       - LOGNAME=${KUSER}
+      - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
+      - KAITHEM_AUDIO_API=jack
+      - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
+      - XAUTHORITY=${XAUTHORITY}
+      - PIPEWIRE_LATENCY="128/48000"
+      - PIPEWIRE_QUANTUM="128/48000"
 
     volumes:
+      # Seems to be needed for getpass.getuser()
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+
       - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
       - $HOME:/home/$KUSER
-      # This is for kaithem's system login based authentication
-      - /etc/passwd:/etc/passwd:ro
       - /dev:/dev
-
-      - /var/lib/sss/pipes:/var/lib/sss/pipes:ro
+      - /tmp:/tmp
 
       # Use the host certificate bundle so we don't have to keep
       # updating the bundle
       - /etc/ssl/certs:/etc/ssl/certs:ro
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
 
-    # devices:
-    #   - /dev/dri:/dev/dri  # For GPU acceleration
 
     network_mode: host
+    pid: host
+
+    group_add:
+      - audio
+      - video
+      - dialout
 
 
   # matter:    

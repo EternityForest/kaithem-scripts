@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-kaithem-host-services = "kaithem_host_services.cli:main"
+kaithem-host-services = "kaithem_host_services:main"
 
 [build-system]
 requires = ["hatchling"]
