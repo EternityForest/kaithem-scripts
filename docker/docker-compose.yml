@@ -36,6 +36,7 @@ services:
       - /etc/group:/etc/group:ro
 
       - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
+      - /var/run/dbus:/var/run/dbus
       - $HOME:/home/$KUSER
       - /dev:/dev
       - /tmp:/tmp
@@ -53,6 +54,8 @@ services:
       - audio
       - video
       - dialout
+    
+    restart: unless-stopped
 
 
   # matter:    
@@ -66,3 +69,4 @@ services:
   #   security_opt:
   #     - apparmor:unconfined
   #   user: "${KUID}:${KGID}"
+  #   restart: unless-stopped

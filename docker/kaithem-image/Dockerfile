@@ -46,6 +46,9 @@ WORKDIR /app/debian
 #     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
 #     make root-install-system-dependencies
 
+# network-manager has nmcli needed to get wifi status
+# libnss-mdns is needed to get .local even with dicker host netwowking apparently
+# ffmpeg used by chandler to inspect media metadata
 
 # Mount host-cached directories into the container during the build phase
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -55,7 +58,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     caps gstreamer1.0-plugins-ugly libfluidsynth3 gstreamer1.0-pocketsphinx \
     x42-plugins gstreamer1.0-opencv  gstreamer1.0-vaapi gstreamer1.0-pipewire \
     build-essential libasound2-dev libjack-jackd2-dev pipewire-jack gir1.2-gtk-3.0 \
-    python3-venv gstreamer1.0-libav
+    python3-venv gstreamer1.0-libav network-manager libnss-mdns ffmpeg
 
 # Copy dependency definition files first for efficient layering
 
