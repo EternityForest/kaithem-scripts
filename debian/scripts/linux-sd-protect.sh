@@ -347,4 +347,4 @@ systemctl enable ember-random-seed
 
 # Run the user specific stuff.  Do in separate
 # script to make the sudo cleaner
-sudo -i -u $KAITHEM_USER bash linux-sd-protect-user.sh
+sudo -i -u $KAITHEM_USER ./linux-sd-protect-user.sh
