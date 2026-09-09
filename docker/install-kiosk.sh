@@ -56,7 +56,6 @@ fi
 if command -v raspi-config &> /dev/null; then
   # Auto login
   echo "Configuring raspi to auto boot as default user"
-
   sudo raspi-config nonint do_boot_behaviour B4
 fi
 
@@ -84,6 +83,6 @@ cat << EOF > ~/.config/autostart/kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application
-Exec=sh -c "cd $HOME/kaithem-docker-home && docker compose up -f  -d kiosk"
+Exec=sh -c "cd $HOME/kaithem-docker-home && KAITHEM_UID=$(id -u) KAITHEM_GROUP=$(id -g) KAITHEM_USER=$(id -un) docker compose up -f -d kiosk"
 Terminal=false
 EOF

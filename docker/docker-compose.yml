@@ -1,8 +1,10 @@
 
 # Run with export KAITHEM_UID=$UID KAITHEM_GROUP=$GID KAITHEM_USER=$USER; sudo -E docker compose up
 services:
+  # This is the actual app, the rest are for testing
   kaithem:
-    image: kaithem:dev
+    restart: "no"
+    image: cooperskeep/kaithem:0.96.0
     privileged: true
 
     cap_add:
@@ -10,15 +12,15 @@ services:
     ulimits:
       rtprio: 99
 
-    user: "${KAITHEM_UID}:${KAITHEM_GROUP}"
+
+    user: "${KAITHEM_UID:?error}:${KAITHEM_GROUP:?error}"
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
       - PIPEWIRE_REMOTE=pipewire-0
-      - USER=${KAITHEM_USER}
-      - HOME=/home/${KAITHEM_USER}
-      - LOGNAME=${KAITHEM_USER}
+      - USER=${KAITHEM_USER:?error}
+      - LOGNAME=${KAITHEM_USER:?error}
       - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
       - KAITHEM_AUDIO_API=jack
       - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
@@ -30,20 +32,21 @@ services:
       # Seems to be needed for getpass.getuser()
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
-
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /usr/lib/locale:/usr/lib/locale:ro
       - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
       - /var/run/dbus:/var/run/dbus
-      - $HOME:/home/$KAITHEM_USER
       - /dev:/dev
       - /tmp:/tmp
-      - /var/log/journal:/var/log/journal:ro 
-      - /run/log/journal:/run/log/journal:ro 
-      - /run/systemd/journal/socket:/run/systemd/journal/socket
 
       # Use the host certificate bundle so we don't have to keep
       # updating the bundle
       - /etc/ssl/certs:/etc/ssl/certs:ro
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
+
+    tmpfs:
+      - /app-home:mode=755,uid=1000,gid=1000,size=512M
 
     network_mode: host
     pid: host
@@ -52,17 +55,66 @@ services:
       - audio
       - video
       - dialout
-    
-    restart: unless-stopped
+
+  kaithem-kiosk:
+    restart: "no"
+    image: cooperskeep/kaithem-kiosk:0.96.0
+  
+    cap_add:
+      - SYS_NICE
+    ulimits:
+      rtprio: 99
+
+    security_opt:
+    - apparmor:unconfined
+
+    user: "${KAITHEM_UID:?error}:${KAITHEM_GROUP:?error}"
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+      - PIPEWIRE_REMOTE=pipewire-0
+      - USER=${KAITHEM_USER:?error}
+      - HOME=/home/${KAITHEM_USER:?error}
+      - LOGNAME=${KAITHEM_USER:?error}
+      - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
+      - KAITHEM_AUDIO_API=jack
+      - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
+      - XAUTHORITY=${XAUTHORITY}
+      - PIPEWIRE_LATENCY="128/48000"
+      - PIPEWIRE_QUANTUM="128/48000"
+      - KIOSK_URL="${KIOSK_URL:-http://localhost:8002}"
+
+    volumes:
+      - /var/run/dbus:/var/run/dbus
+      - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
+      - /dev:/dev
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /usr/lib/locale:/usr/lib/locale:ro
+
+    tmpfs:
+      - /dev/shm:size=300M,mode=1777
+
+    network_mode: host
+
+    group_add:
+      - audio
+      - video
+      - dialout
 
 
   matter:    
-    image: ghcr.io/matter-js/python-matter-server:8.1.2
+    image: ghcr.io/matter-js/matterjs-server:stable
     volumes:
       - $HOME/kaithem/python-matter-server:/data
       - /run/dbus:/run/dbus:ro
-        - /etc/ssl/certs:/etc/ssl/certs:ro
-        - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
+    
+    environment:
+      - NOBLE_BINDINGS=dbus
+
     network_mode: host
     security_opt:
       - apparmor:unconfined

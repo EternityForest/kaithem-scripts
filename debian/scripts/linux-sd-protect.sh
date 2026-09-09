@@ -15,11 +15,11 @@ set -e
 
 
 
-# Use the KAITHEM_UID variable to set a user ID that will be running the code.
+# Use the SD_PROTECT_UID variable to set a user ID that will be running the code.
 # 1000 is the default on almost all Linux systems
-[ -z "$KAITHEM_UID" ] && KAITHEM_UID=1000
+[ -z "$SD_PROTECT_UID" ] && SD_PROTECT_UID=1000
 
-[ -z "$KAITHEM_USER" ] && KAITHEM_USER=$(id -un $KAITHEM_UID)
+[ -z "$SD_PROTECT_USER" ] && SD_PROTECT_USER=$(id -un $SD_PROTECT_UID)
 
 
 # X11 still exists even though Wayland is defayult
@@ -59,28 +59,28 @@ systemctl disable systemd-random-seed.service
 ! systemctl disable systemd-readahead-replay.service
 
 # ************* Wireplumber state dir  ************************
-mkdir -p /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
-chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local
-chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local/state/
-chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber
+mkdir -p /home/$(id -un $SD_PROTECT_UID)/.local/state/wireplumber/
+chown $SD_PROTECT_USER /home/$(id -un $SD_PROTECT_UID)/.local
+chown $SD_PROTECT_USER /home/$(id -un $SD_PROTECT_UID)/.local/state/
+chown $SD_PROTECT_USER /home/$(id -un $SD_PROTECT_UID)/.local/state/wireplumber
 
 
-cat << EOF > /etc/systemd/system/home-$(id -un $KAITHEM_UID)-.local-state-wireplumber.mount
+cat << EOF > /etc/systemd/system/home-$(id -un $SD_PROTECT_UID)-.local-state-wireplumber.mount
 [Unit]
 Description=Flash saver ramdisk
 Before=local-fs.target
 
 [Mount]
 What=tmpfs
-Where=/home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
+Where=/home/$(id -un $SD_PROTECT_UID)/.local/state/wireplumber/
 Type=tmpfs
-Options=defaults,noatime,nosuid,nodev,noexec,mode=0777,size=32M,uid=$KAITHEM_UID
+Options=defaults,noatime,nosuid,nodev,noexec,mode=0777,size=32M,uid=$SD_PROTECT_UID
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-systemctl enable home-$(id -un $KAITHEM_UID)-.local-state-wireplumber.mount
+systemctl enable home-$(id -un $SD_PROTECT_UID)-.local-state-wireplumber.mount
 
 # *********************** Xsession errors ****************************
 
@@ -94,26 +94,26 @@ sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/dev\/null'/ /etc/X11/X
 # run.log has a user level logrotate
 
 #Before we cover it up, remove whats already there so it doesn't waste space forever
-! rm /home/$(id -un $KAITHEM_UID)/.cache/lxsession/LXDE-pi/run.log
+! rm /home/$(id -un $SD_PROTECT_UID)/.cache/lxsession/LXDE-pi/run.log
 
-mkdir -p /home/$(id -un $KAITHEM_UID)/.cache/lxsession/
+mkdir -p /home/$(id -un $SD_PROTECT_UID)/.cache/lxsession/
 
-cat << EOF > /etc/systemd/system/home-$(id -un $KAITHEM_UID)-.cache-lxsession.mount
+cat << EOF > /etc/systemd/system/home-$(id -un $SD_PROTECT_UID)-.cache-lxsession.mount
 [Unit]
 Description=Flash saver ramdisk
 Before=local-fs.target
 
 [Mount]
 What=tmpfs
-Where=/home/$(id -un $KAITHEM_UID)/.cache/lxsession/
+Where=/home/$(id -un $SD_PROTECT_UID)/.cache/lxsession/
 Type=tmpfs
-Options=defaults,noatime,nosuid,nodev,noexec,mode=0755,size=32M,uid=$KAITHEM_UID
+Options=defaults,noatime,nosuid,nodev,noexec,mode=0755,size=32M,uid=$SD_PROTECT_UID
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-systemctl enable home-$(id -un $KAITHEM_UID)-.cache-lxsession.mount
+systemctl enable home-$(id -un $SD_PROTECT_UID)-.cache-lxsession.mount
 
 
 
@@ -343,8 +343,3 @@ touch /run/cprng-seeded
 EOF
 
 systemctl enable ember-random-seed
-
-
-# Run the user specific stuff.  Do in separate
-# script to make the sudo cleaner
-sudo -i -u $KAITHEM_USER ./linux-sd-protect-user.sh
