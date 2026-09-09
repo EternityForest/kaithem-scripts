@@ -148,13 +148,6 @@ root-install-raspios-linux-tweaks: root-install-sd-protection root-use-pipewire-
 	@cd ${CONFIG_HELPERS_DIR}
 	@bash ./scripts/linux-tweaks.sh
 
-
-.PHONY: root-uninstall-bloatware
-root-uninstall-bloatware: # Uninstall random junk you probably don't want on an embedded system.
-	@cd ${CONFIG_HELPERS_DIR}
-	@bash ./scripts/uninstall-bloatware.sh
-
-
 .PHONY: root-install-utilities
 root-install-utilities: # Install random junk you might want, like drivers for obscure devices and troubleshooting utils
 	@cd ${CONFIG_HELPERS_DIR}

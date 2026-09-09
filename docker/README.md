@@ -9,7 +9,7 @@ For anything else, replace the apt-get commands with your equivalent.
 # Download this repo.
 sudo apt install -y make git
 git clone https://github.com/EternityForest/kaithem-scripts
-cd kaithem-scripts/debian
+cd kaithem-scripts/docker
 
 
 
