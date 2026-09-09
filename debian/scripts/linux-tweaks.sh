@@ -168,6 +168,8 @@ wifi.scan-rand-mac-address=no
 
 [connection]
 wifi.powersave = 2
+# MDNS responder by default
+connection.mdns=2
 
 [connection-mac-randomization]
 ethernet.cloned-mac-address=permanent
@@ -201,3 +203,18 @@ addr-gen-mode=eui64
 dns-search=
 method=auto
 EOF
+
+# Avahi has a horrible bug where it imagines name conflicts
+# And adds numbers to the end of the names
+
+cat << EOF > /etc/systemd/resolved.conf
+[Resolve]
+MulticastDNS=yes
+
+EOF
+
+# This might break USB printing
+apt-get -y remove avahi-daemon
+systemctl disable --now avahi-daemon.service avahi-daemon.socket
+systemctl mask avahi-daemon.service avahi-daemon.socket
+systemctl restart systemd-resolved

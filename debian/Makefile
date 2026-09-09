@@ -50,29 +50,7 @@ help: # Show help for each of the available commands
 	@grep -E '^[a-zA-Z0-9\. -]+:.*#'  Makefile | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#'| fold -w 60 -s)\n\n"; done
 
 
-.PHONY: root-install-zrok
-root-install-zrok: # Install or update Zrok for remote access
-	@cd ${CONFIG_HELPERS_DIR}
-	@bash ./scripts/install-zrok.sh
 
-
-.PHONY: root-setup-matter-server
-root-setup-matter-server: # Set up or update python-matter-server
-	@sudo bash ./kaithem_scripts/scripts/enable-matter.sh
-
-.PHONY: user-setup-zrok-sharing
-user-setup-zrok-sharing: # Create an account with zrok
-	@cd ${CONFIG_HELPERS_DIR}
-	@bash ./scripts/setup-zrok.sh
-
-
-.PHONY: user-set-global-pipewire-conf
-user-set-global-pipewire-conf:
-	@echo ${USER}
-	@cd ${CONFIG_HELPERS_DIR}
-	@mkdir -p /home/${USER}/.config/pipewire/
-	@cat ./scripts/pipewire.conf > /home/${USER}/.config/pipewire/pipewire.conf
-	@systemctl --user restart pipewire wireplumber
 
 .PHONY: user-install-kaithem
 user-start-kaithem-at-boot: # Install kaithem to run as your user. Note that it only runs when you are logged in.
@@ -107,20 +85,6 @@ user-restart-kaithem: # Get the status of the running kaithem instance
 	@systemctl --user restart kaithem.service
 
 
-# gstreamer1.0-tools is needed for gst-launch dummy sources
-# build-essential python3-dev are needed for some python packages to work
-
-#  libasound2-dev and   libjack-jackd2-dev is for python rtmidi
-.PHONY: root-install-system-dependencies
-root-install-system-dependencies: # Install non-python libraries using apt
-	@sudo apt install -y python3 mpv lm-sensors python3-gst-1.0 \
-	gstreamer1.0-plugins-good  gstreamer1.0-plugins-bad \
-	gstreamer1.0-tools swh-plugins  tap-plugins  caps  \
-	gstreamer1.0-plugins-ugly \
-	gstreamer1.0-pocketsphinx x42-plugins gstreamer1.0-opencv \
-	gstreamer1.0-vaapi gstreamer1.0-pipewire build-essential \
-	python3-dev  libasound2-dev  libjack-jackd2-dev pipewire-jack
-
 .PHONY: user-install-kaithem
 user-install-kaithem: # Install the Kaithem python package itself
 	bash ./scripts/get-uv.sh
@@ -137,14 +101,9 @@ root-install-sd-protection: # Reconfigure a Pi system or similar to not write to
 	@cd ${CONFIG_HELPERS_DIR}
 	@bash ./scripts/linux-sd-protect.sh
 
-.PHONY: root-install-lightdm-kiosk
-root-install-lightdm-kiosk: # Sets up a pi(or similar) as a kiosk machine pointing to KIOSK_HOMEPAGE(default is kaithem at localhost:8002)
-	@cd ${CONFIG_HELPERS_DIR}
-	@bash ./scripts/setup-kiosk-mode.sh
-	@/usr/bin/python3 ${CONFIG_HELPERS_DIR}/pi_boot_cfg.py --set_hdmi_force_hotplug=1 || true
 
-.PHONY: root-install-raspios-linux-tweaks
-root-install-raspios-linux-tweaks: root-install-sd-protection root-use-pipewire-jack # Installs assorted tweaks to the Linux system.  Only use on dedicated devices. User specific things apply to KAITHEM_USER
+.PHONY: root-install-debian-tweaks
+root-install-debian-tweaks: root-use-pipewire-jack # Installs assorted tweaks to the Linux system.  Only use on dedicated devices. User specific things apply to KAITHEM_USER
 	@cd ${CONFIG_HELPERS_DIR}
 	@bash ./scripts/linux-tweaks.sh
 
@@ -152,14 +111,3 @@ root-install-raspios-linux-tweaks: root-install-sd-protection root-use-pipewire-
 root-install-utilities: # Install random junk you might want, like drivers for obscure devices and troubleshooting utils
 	@cd ${CONFIG_HELPERS_DIR}
 	@bash ./scripts/install-utilities.sh
-
-
-.PHONY: root-enable-anon-mqtt
-root-enable-anon-mqtt: # Set up an MQTT broker for anonymous login acccess
-	@cd ${CONFIG_HELPERS_DIR}
-	@bash ./scripts/setup-anon-mosquitto.sh
-
-
-.PHONY: root-enable-passwordless-sudo
-root-enable-passwordless-sudo: # Set up passwordless sudo for the root user
-	@echo "%sudo ALL=(ALL) NOPASSWD:ALL" | sudo EDITOR="tee -a" visudo -f /etc/sudoers.d/sudo-nopasswd
