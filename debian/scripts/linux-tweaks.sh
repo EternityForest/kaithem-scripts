@@ -160,7 +160,6 @@ EOF
 cat << EOF > /etc/NetworkManager/NetworkManager.conf
 [main]
 plugins=ifupdown,keyfile
-dns=systemd-resolved
 
 [ifupdown]
 managed=true
@@ -170,8 +169,7 @@ wifi.scan-rand-mac-address=no
 
 [connection]
 wifi.powersave = 2
-# MDNS responder by default
-connection.mdns=2
+
 
 [connection-mac-randomization]
 ethernet.cloned-mac-address=permanent
