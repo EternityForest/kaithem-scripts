@@ -6,10 +6,19 @@ For anything else, replace the apt-get commands with your equivalent.
 
 ```bash
 
-# Download this repo.
-sudo apt install -y make git
+
+
+#Might need to remove some stuff on Raspi
+
+# sudo apt remove firefox rpi-imager python3-mypy python3-numpy rpi-userguide vlc evince
+
+# Download this repo and install some host level packages.
+# Rtkit sets up the rtkit group we need for real time audio.
+sudo apt install -y make git rtkit
+
 git clone https://github.com/EternityForest/kaithem-scripts
 cd kaithem-scripts/docker
+
 
 
 ## Add needed user permissions
@@ -34,7 +43,7 @@ cd kaithem-scripts/docker
 
 
 # Install Docker however you prefer
-sudo apt install git docker.io docker-compose-v2 docker-cli
+sudo apt install git docker.io docker-compose docker-cli
 
 # Install UV if you haven't already
 curl -LsSf https://astral.sh/uv/install.sh | sh

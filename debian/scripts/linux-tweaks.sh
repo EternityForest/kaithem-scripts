@@ -14,6 +14,7 @@
 set -x
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
 
 # Require root
 if [ "$(id -u)" -ne 0 ]; then
@@ -159,6 +160,7 @@ EOF
 cat << EOF > /etc/NetworkManager/NetworkManager.conf
 [main]
 plugins=ifupdown,keyfile
+dns=systemd-resolved
 
 [ifupdown]
 managed=true
@@ -207,14 +209,22 @@ EOF
 # Avahi has a horrible bug where it imagines name conflicts
 # And adds numbers to the end of the names
 
-cat << EOF > /etc/systemd/resolved.conf
-[Resolve]
-MulticastDNS=yes
 
+cat << EOF > /etc/systemd/system/restart-avahi-hack.service
+[Unit]
+Description=Restart Avahi after boot to clear false positive conflicts
+After=network-online.target avahi-daemon.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Give the system a brief moment to stabilize interfaces completely
+ExecStartPre=/bin/sleep 10
+# Force restart the main avahi service
+ExecStart=/usr/bin/systemctl restart avahi-daemon.service
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
-# This might break USB printing
-apt-get -y remove avahi-daemon
-systemctl disable --now avahi-daemon.service avahi-daemon.socket
-systemctl mask avahi-daemon.service avahi-daemon.socket
-systemctl restart systemd-resolved
+systemctl enable restart-avahi-hack.service

@@ -18,6 +18,4 @@ fi
 cd ~/kaithem-docker-home
 
 echo "Starting service"
-KAITHEM_UID=$(id -u) KAITHEM_GROUP=$(id -g) KAITHEM_USER=$(id -un) docker compose up -d kaithem
-
-open http://localhost:8002
+KAITHEM_UID=$(id -u) KAITHEM_GROUP=$(id -g) KAITHEM_USER=$(id -un) sudo -E docker compose up -d kaithem
