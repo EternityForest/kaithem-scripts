@@ -1,8 +1,8 @@
 
-# Run with export KUID=$UID KGID=$GID KUSER=$USER; sudo -E docker compose up
+# Run with export KAITHEM_UID=$UID KAITHEM_GROUP=$GID KAITHEM_USER=$USER; sudo -E docker compose up
 services:
   kaithem:
-    image: kaithemautomation/kaithem
+    image: kaithem:dev
     privileged: true
 
     cap_add:
@@ -10,19 +10,15 @@ services:
     ulimits:
       rtprio: 99
 
-    build:
-      context: ..
-      dockerfile: docker/kaithem-image/Dockerfile
-
-    user: "${KUID}:${KGID}"
+    user: "${KAITHEM_UID}:${KAITHEM_GROUP}"
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
       - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
       - PIPEWIRE_REMOTE=pipewire-0
-      - USER=${KUSER}
-      - HOME=/home/${KUSER}
-      - LOGNAME=${KUSER}
+      - USER=${KAITHEM_USER}
+      - HOME=/home/${KAITHEM_USER}
+      - LOGNAME=${KAITHEM_USER}
       - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
       - KAITHEM_AUDIO_API=jack
       - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
@@ -37,15 +33,17 @@ services:
 
       - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
       - /var/run/dbus:/var/run/dbus
-      - $HOME:/home/$KUSER
+      - $HOME:/home/$KAITHEM_USER
       - /dev:/dev
       - /tmp:/tmp
+      - /var/log/journal:/var/log/journal:ro 
+      - /run/log/journal:/run/log/journal:ro 
+      - /run/systemd/journal/socket:/run/systemd/journal/socket
 
       # Use the host certificate bundle so we don't have to keep
       # updating the bundle
       - /etc/ssl/certs:/etc/ssl/certs:ro
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
-
 
     network_mode: host
     pid: host
@@ -58,15 +56,15 @@ services:
     restart: unless-stopped
 
 
-  # matter:    
-  #   image: ghcr.io/matter-js/python-matter-server:8.1.2
-  #   volumes:
-  #     - $HOME/kaithem/python-matter-server:/data
-  #     - /run/dbus:/run/dbus:ro
-        # - /etc/ssl/certs:/etc/ssl/certs:ro
-        # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
-  #   network_mode: host
-  #   security_opt:
-  #     - apparmor:unconfined
-  #   user: "${KUID}:${KGID}"
-  #   restart: unless-stopped
+  matter:    
+    image: ghcr.io/matter-js/python-matter-server:8.1.2
+    volumes:
+      - $HOME/kaithem/python-matter-server:/data
+      - /run/dbus:/run/dbus:ro
+        - /etc/ssl/certs:/etc/ssl/certs:ro
+        - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
+    network_mode: host
+    security_opt:
+      - apparmor:unconfined
+    user: "${KAITHEM_UID}:${KAITHEM_GROUP}"
+    restart: unless-stopped

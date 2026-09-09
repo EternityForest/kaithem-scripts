@@ -1,5 +1,8 @@
 ## KaithemAutomation Provisioning on Debian 
 
+Run this as the kaithem user.  Some commands may use sudo
+and ask for a password.
+
 ```bash
 ## Download this repo 
 sudo apt install -y make git
@@ -11,6 +14,23 @@ cd kaithem-scripts/debian
 
 make root-install-system-dependencies
 make user-install-kaithem
+
+
+## Give the kaithem user hardware permissions
+#####################################################################3
+! sudo -E usermod -a -G audio $(id -un)
+# Low latency audio
+! sudo -E usermod -a -G rtkit $(id -un)
+# serial ports and dmx adapters
+! sudo -E usermod -a -G dialout $(id -un)
+! sudo -E usermod -a -G serial $(id -un)
+
+# USB hardware
+! sudo -E usermod -a -G plugdev $(id -un)
+# View system logs
+! sudo -E usermod -a -G adm $(id -un)
+
+! sudo -E usermod -a -G bluetooth $(id -un)
 
 ```
 
@@ -43,6 +63,7 @@ make user-max-volume-at-boot
 # excessively to the SD card. On a raspberry pi this
 # Should make the system much more reliable without
 # making anything work differently, except for putting logs in RAM
+# Actually just run as user
 make root-install-sd-protection
 
 

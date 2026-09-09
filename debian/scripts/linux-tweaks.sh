@@ -8,7 +8,6 @@
 # The SD card protection stuff lives in another file.
 
 # * Disable Wifi sleep and privacy MAC
-# * Give lots of permissions to KAITHEM_UID
 # * Remove rsyslog if present
 # * Disable auto-update
 
@@ -26,31 +25,9 @@ fi
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 
-# Install Atuin
-! su $(id -un $KAITHEM_UID) curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+apt update
 
-
-
-mkdir -p /home/$(id -un $KAITHEM_UID)/kioskify-setup
-
-sudo apt update
-
-sudo apt-get install -y git git-lfs python3 python3-pip
-
-
-## User perms
-#####################################################################3
-! sudo usermod -a -G dialout $(id -un $KAITHEM_UID)
-! sudo usermod -a -G serial $(id -un $KAITHEM_UID)
-! sudo usermod -a -G pulse-access $(id -un $KAITHEM_UID)
-! sudo usermod -a -G bluetooth $(id -un $KAITHEM_UID)
-! sudo usermod -a -G audio $(id -un $KAITHEM_UID)
-! sudo usermod -a -G plugdev $(id -un $KAITHEM_UID)
-! sudo usermod -a -G sudo $(id -un $KAITHEM_UID)
-! sudo usermod -a -G lpadmin $(id -un $KAITHEM_UID)
-! sudo usermod -a -G adm $(id -un $KAITHEM_UID)
-! sudo usermod -a -G rtkit $(id -un $KAITHEM_UID)
-
+apt-get install -y git git-lfs python3 python3-pip
 
 
 #   /\/\ (_)___  ___ 
@@ -61,17 +38,6 @@ sudo apt-get install -y git git-lfs python3 python3-pip
 
 # Misc setup
 ##############################################
-
-
-# cat << EOF > /etc/polkit-1/rules.d/10-kaithem.rules
-# # Do Not Edit Manually!!!  This file is managed by Kaithem
-# polkit.addRule(function(action, subject) {
-#     if (action.id == "org.freedesktop.timedate1.set-time" &&
-#         subject.user == "$(id -un $KAITHEM_UID)") { // Replace with the actual username
-#         return polkit.Result.YES;
-#     }
-# });
-# EOF
 
 
 cat << EOF > /etc/security/limits.conf
@@ -93,16 +59,16 @@ echo "Disable overscan"
 fi
 
 # Systemd all the way
-! sudo apt-get -y purge rsyslog
+! apt-get -y purge rsyslog
 
 #Eliminate the apt-daily updates that were the suspected cause of periodic crashes in real deployments
-sudo systemctl mask apt-daily-upgrade
-sudo systemctl mask apt-daily.service
-sudo systemctl mask apt-daily.timer
+systemctl mask apt-daily-upgrade
+systemctl mask apt-daily.service
+systemctl mask apt-daily.timer
 
-sudo systemctl disable apt-daily-upgrade.timer
-sudo systemctl disable apt-daily.timer
-sudo systemctl disable apt-daily.service
+systemctl disable apt-daily-upgrade.timer
+systemctl disable apt-daily.timer
+systemctl disable apt-daily.service
 
 # Remove SSH warning on the pi
 if [ -f /etc/profile.d/sshpwd.sh ]; then
@@ -165,7 +131,7 @@ mkdir -p  /usr/lib/systemd/system.conf.d/
 #Set up the watchdog timer to handle really bad crashes
 # This can make it nt even boot if you set a bad time value...
 cat << EOF > /usr/lib/systemd/system.conf.d/20-emberos-watchdog.conf
-# This file is part of EmberOS, it enables the hardware watchdog to allow recovery from
+# This file enables the hardware watchdog to allow recovery from
 # total system crashes
 [Manager]
 RuntimeWatchdogSec=15
@@ -235,37 +201,3 @@ addr-gen-mode=eui64
 dns-search=
 method=auto
 EOF
-
-
-
-#########################################################
-# Install SD card monitoring utility
-
-
-cd /home/$(id -un $KAITHEM_UID)/kioskify-setup
-
-
-if [ `uname -m` == "aarch64" ]; then
-
-# This is the program that lets us get the SanDisk industrial health data.
-
-# If file exists but is 0 bytes, delete it
-[ -s sdmon-arm64.tar.gz ] || rm sdmon-arm64.tar.gz
-
-wget -nc  https://github.com/Ognian/sdmon/releases/download/v0.9.0/sdmon-arm64.tar.gz
-tar zxf sdmon-arm64.tar.gz
-mv sdmon /usr/bin
-chmod 755 /usr/bin/sdmon 
-
-# This is the program that lets us get the SanDisk industrial health data.
-
-# If file exists but is 0 bytes, delete it
-[ -s bluetuith_0.2.2_Linux_arm64.tar.gz ] || rm bluetuith_0.2.2_Linux_arm64.tar.gz
-
-wget -nc  https://github.com/darkhz/bluetuith/releases/download/v0.2.2/bluetuith_0.2.2_Linux_arm64.tar.gz
-tar zxf bluetuith_0.2.2_Linux_arm64.tar.gz
-mv bluetuith /usr/bin
-chmod 755 /usr/bin/bluetuith 
-
-fi
-

@@ -14,11 +14,6 @@ set -x
 set -e
 
 
-# Require root
-if [ "$(id -u)" -ne 0 ]; then
-        echo 'This script must be run by root' >&2
-        exit 1
-fi
 
 # Use the KAITHEM_UID variable to set a user ID that will be running the code.
 # 1000 is the default on almost all Linux systems
@@ -31,7 +26,7 @@ fi
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # No more swap to wear the disk!!!
-! sudo apt-get purge -y dphys-swapfile
+! apt-get purge -y dphys-swapfile
 
 
 
@@ -42,7 +37,7 @@ echo "This system has rpi-swap, configuring zram only"
 
 mkdir -p /etc/rpi/swap.conf.d
 
-cat << EOF > /etc/rpi/swap.conf.d/ember-rpi-swap.conf
+tee << EOF > /etc/rpi/swap.conf.d/ember-rpi-swap.conf
 
 [Main]
 Mechanism=zram
@@ -63,37 +58,40 @@ systemctl disable systemd-random-seed.service
 ! systemctl disable systemd-readahead-collect.service
 ! systemctl disable systemd-readahead-replay.service
 
-mkdir -p /home/$(id -un $KAITHEM_UID)/.local/state
-
-! rm -rf  /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
-mkdir -p /var/run/$(id -un $KAITHEM_UID)-wireplumber-state/
-# Make it look like it's in the same place so we can get to it easily
-ln -s /var/run/$(id -un $KAITHEM_UID)-wireplumber-state  /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber
-
+# ************* Wireplumber state dir  ************************
+mkdir -p /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
+chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local
+chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local/state/
+chown $KAITHEM_USER /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber
 
 
+cat << EOF > /etc/systemd/system/home-$(id -un $KAITHEM_UID)-.local-state-wireplumber.mount
+[Unit]
+Description=Flash saver ramdisk
+Before=local-fs.target
+
+[Mount]
+What=tmpfs
+Where=/home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
+Type=tmpfs
+Options=defaults,noatime,nosuid,nodev,noexec,mode=0777,size=32M,uid=$KAITHEM_UID
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable home-$(id -un $KAITHEM_UID)-.local-state-wireplumber.mount
+
+# *********************** Xsession errors ****************************
 
 
 # Xsession errors is a big offender for wrecking down your disk with writes
-sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/var\/log\/\$KAITHEM_USER\-xsession\-errors'/g /etc/X11/Xsession
+# It may still be written on Wayland!!!
+sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/dev\/null'/ /etc/X11/Xsession
 
 
-cat << EOF > /etc/logrotate.d/xsession
-/var/log/$KAITHEM_USER-xsession-errors {
-  rotate 2 
-  daily
-  compress
-  missingok
-  notifempty
-}
-EOF
 
-! rm  /home/$(id -un $KAITHEM_UID)/.xsession-errors
-# Make it look like it's in the same place so we can get to it easily
-ln -s /var/log/ember-xsession-errors /home/$(id -un $KAITHEM_UID)/.xsession-errors
-
-
-#/run should already be tmpfs on non-insane setups
+# run.log has a user level logrotate
 
 #Before we cover it up, remove whats already there so it doesn't waste space forever
 ! rm /home/$(id -un $KAITHEM_UID)/.cache/lxsession/LXDE-pi/run.log
@@ -116,40 +114,6 @@ WantedBy=multi-user.target
 EOF
 
 systemctl enable home-$(id -un $KAITHEM_UID)-.cache-lxsession.mount
-
-
-
-! rm -rf /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
-mkdir -p /home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
-
-cat << EOF > /etc/systemd/system/home-$(id -un $KAITHEM_UID)-.local-state-wireplumber.mount
-[Unit]
-Description=Flash saver ramdisk
-Before=local-fs.target
-
-[Mount]
-What=tmpfs
-Where=/home/$(id -un $KAITHEM_UID)/.local/state/wireplumber/
-Type=tmpfs
-Options=defaults,noatime,nosuid,nodev,noexec,mode=0777,size=32M,uid=$KAITHEM_UID
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl enable home-$(id -un $KAITHEM_UID)-.cache-lxsession.mount
-
-
-
-cat << EOF > /etc/logrotate.d/lxsessionrunlog
-/home/$(id -un $KAITHEM_UID)/.cache/lxsession/LXDE-pi/run.log {
-  rotate 2 
-  daily
-  compress
-  missingok
-  notifempty
-}
-EOF
 
 
 
@@ -231,7 +195,6 @@ EOF
 systemctl enable var-log.mount
 
 
-
 cat << EOF > /etc/systemd/system/var-lib-logrotate.mount
 [Unit]
 Description=Flash saver ramdisk
@@ -285,25 +248,6 @@ WantedBy=multi-user.target
 EOF
 
 systemctl enable var-lib-systemd.mount
-
-
-
-cat << EOF > /etc/systemd/system/var-lib-chrony.mount
-[Unit]
-Description=Flash saver ramdisk
-Before=local-fs.target
-
-[Mount]
-What=tmpfs
-Where=/var/lib/chrony
-Type=tmpfs
-Options=defaults,noatime,nosuid,mode=0755,size=8m
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl enable var-lib-chrony.mount
 
 
 cat << EOF > /etc/systemd/system/var-tmp.mount
@@ -399,3 +343,8 @@ touch /run/cprng-seeded
 EOF
 
 systemctl enable ember-random-seed
+
+
+# Run the user specific stuff.  Do in separate
+# script to make the sudo cleaner
+sudo -i -u $KAITHEM_UID bash linux-sd-protect-user.sh

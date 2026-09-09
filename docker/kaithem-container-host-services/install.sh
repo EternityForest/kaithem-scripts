@@ -3,6 +3,9 @@
 # --user service that starts on login.
 set -euo pipefail
 
+echo ">> Installing kaithem-host-services"
+
+
 # Allow `bash install.sh` even if the user forgot to chmod +x.
 if [[ "${BASH_SOURCE[0]}" == "${0}" && ! -x "${BASH_SOURCE[0]}" ]]; then
     exec bash "$0" "$@"

@@ -116,7 +116,7 @@ root-install-system-dependencies: # Install non-python libraries using apt
 	@sudo apt install -y python3 mpv lm-sensors python3-gst-1.0 \
 	gstreamer1.0-plugins-good  gstreamer1.0-plugins-bad \
 	gstreamer1.0-tools swh-plugins  tap-plugins  caps  \
-	gstreamer1.0-plugins-ugly libfluidsynth3 \
+	gstreamer1.0-plugins-ugly \
 	gstreamer1.0-pocketsphinx x42-plugins gstreamer1.0-opencv \
 	gstreamer1.0-vaapi gstreamer1.0-pipewire build-essential \
 	python3-dev  libasound2-dev  libjack-jackd2-dev pipewire-jack
