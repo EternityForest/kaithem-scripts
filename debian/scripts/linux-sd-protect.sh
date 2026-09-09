@@ -161,7 +161,7 @@ Before=local-fs.target
 What=tmpfs
 Where=/tmp
 Type=tmpfs
-Options=defaults,noatime,nosuid,nodev,mode=1777,size=786M
+Options=defaults,noatime,nosuid,nodev,mode=1777,size=85%
 
 [Install]
 WantedBy=multi-user.target
@@ -259,7 +259,7 @@ Before=local-fs.target
 What=tmpfs
 Where=/var/tmp
 Type=tmpfs
-Options=defaults,noatime,nosuid,mode=1777,size=128M
+Options=defaults,noatime,nosuid,mode=1777,size=85%
 
 [Install]
 WantedBy=multi-user.target

@@ -77,9 +77,9 @@ fi
 
 
 
-mkdir -p ~/.config/autostart/
+mkdir -p $HOME/.config/autostart/
 
-cat << EOF > ~/.config/autostart/kiosk.desktop
+cat << EOF > $HOME/.config/autostart/kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application

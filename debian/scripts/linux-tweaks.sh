@@ -136,6 +136,7 @@ cat << EOF > /usr/lib/systemd/system.conf.d/20-emberos-watchdog.conf
 # total system crashes
 [Manager]
 RuntimeWatchdogSec=15
+ShutdownWatchdogSec=10min
 EOF
 
 
