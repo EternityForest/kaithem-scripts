@@ -6,11 +6,6 @@ set -euo pipefail
 echo ">> Installing kaithem-host-services"
 
 
-# Allow `bash install.sh` even if the user forgot to chmod +x.
-if [[ "${BASH_SOURCE[0]}" == "${0}" && ! -x "${BASH_SOURCE[0]}" ]]; then
-    exec bash "$0" "$@"
-fi
-
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo ">> Installing kaithem-host-services as a uv tool from $HERE"
