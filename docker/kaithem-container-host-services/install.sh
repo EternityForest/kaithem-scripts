@@ -16,7 +16,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo ">> Installing kaithem-host-services as a uv tool from $HERE"
 UV_LINK_MODE=copy uv tool install "$HERE"
 
-UNIT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+UNIT_DIR="$HOME/.config/systemd/user"
 mkdir -p "$UNIT_DIR"
 install -m 0644 "$HERE/systemd/kaithem-host-services.service" "$UNIT_DIR/kaithem-host-services.service"
 
