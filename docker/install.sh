@@ -3,7 +3,7 @@
 # Install the host services app
 
 echo "Installing kaithem-container-host-services"
-sh ./kaithem-container-host-services/install.sh
+bash ./kaithem-container-host-services/install.sh
 
 mkdir -p ~/kaithem-docker-home
 
