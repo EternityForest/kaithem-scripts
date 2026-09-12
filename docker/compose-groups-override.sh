@@ -33,8 +33,6 @@ list=$(printf '%s\n' $gids \
 cat << EOF > $HOME/kaithem-docker-home/compose-groups.yml
 name: kaithem
 services:
-  kaithem:
-    group_add: ${list}
-  kaithem-kiosk:
+  groups:
     group_add: ${list}
 EOF

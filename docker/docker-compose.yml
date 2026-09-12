@@ -4,7 +4,7 @@ services:
   # This is the actual app, the rest are for testing
   kaithem:
     extends:
-      file: ./groups.yml
+      file: ./compose-groups.yml
       service: groups
     restart: "no"
     image: cooperskeep/kaithem:0.96.0
