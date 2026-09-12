@@ -3,6 +3,9 @@
 services:
   # This is the actual app, the rest are for testing
   kaithem:
+    extends:
+      file: ./groups.yml
+      service: groups
     restart: "no"
     image: cooperskeep/kaithem:0.96.0
     privileged: true
@@ -102,7 +105,6 @@ services:
       - audio
       - video
       - dialout
-
 
   matter:    
     image: ghcr.io/matter-js/matterjs-server:stable

@@ -14,6 +14,7 @@ else
     echo "$HOME/kaithem-docker-home/docker-compose.yml already exists"
 fi
 
+bash ./compose-groups-override.sh
 
 cd $HOME/kaithem-docker-home
 
