@@ -42,14 +42,14 @@ services:
       - /var/run/dbus:/var/run/dbus
       - /dev:/dev
       - /tmp:/tmp
+      - /sys/class:/sys/class
 
       # Use the host certificate bundle so we don't have to keep
       # updating the bundle
       - /etc/ssl/certs:/etc/ssl/certs:ro
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
 
-    tmpfs:
-      - /app-home:mode=755,uid=1000,gid=1000,size=512M
+      - $HOME/kaithem-docker-home:/app-home
 
     network_mode: host
     pid: host
@@ -109,7 +109,7 @@ services:
   matter:    
     image: ghcr.io/matter-js/matterjs-server:stable
     volumes:
-      - $HOME/kaithem/python-matter-server:/data
+      - $HOME/kaithem-docker-home/matter:/app-home
       - /run/dbus:/run/dbus:ro
       - /etc/ssl/certs:/etc/ssl/certs:ro
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
