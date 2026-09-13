@@ -112,13 +112,15 @@ services:
       - $HOME/kaithem-docker-home/matter:/app-home
       - /run/dbus:/run/dbus:ro
       - /etc/ssl/certs:/etc/ssl/certs:ro
-      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
     
     environment:
       - NOBLE_BINDINGS=dbus
+      - PRODUCTION_MODE=true
 
     network_mode: host
     security_opt:
       - apparmor:unconfined
     user: "${KAITHEM_UID}:${KAITHEM_GROUP}"
     restart: unless-stopped
+    command: --listen-address 127.0.0.1

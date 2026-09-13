@@ -19,8 +19,6 @@ echo ">> Reloading systemd --user"
 systemctl --user daemon-reload
 systemctl --user enable --now kaithem-host-services.service
 
-echo ">> Status:"
-systemctl --user --no-pager status kaithem-host-services.service || true
 
 echo
 echo "Socket path (on the host):"
