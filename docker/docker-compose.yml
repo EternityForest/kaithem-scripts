@@ -6,7 +6,7 @@ services:
     extends:
       file: ./compose-groups.yml
       service: groups
-    restart: "no"
+    restart: unless-stopped
     image: cooperskeep/kaithem:0.96.0
     privileged: true
 
@@ -60,6 +60,7 @@ services:
       - dialout
 
   kaithem-kiosk:
+    # Started with xdg desktop after UI loads
     restart: "no"
     image: cooperskeep/kaithem-kiosk:0.96.0
   
