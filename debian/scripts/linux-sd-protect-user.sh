@@ -1,6 +1,7 @@
 #!/bin/bash
 # Set up a user logrotate as the running user
 mkdir -p ~/.config/logrotate.d
+mkdir -p ~/.config/systemd/user
 
 # Systemd it
 cat << EOF > ~/.config/systemd/user/kaithem-tweaks-logrotate.service

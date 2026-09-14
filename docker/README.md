@@ -16,10 +16,15 @@ For anything else, replace the apt-get commands with your equivalent.
 # Rtkit sets up the rtkit group we need for real time audio.
 sudo apt install -y make git rtkit
 
+# Install Docker however you prefer
+sudo apt install -y docker.io docker-compose docker-cli
+
+# Install UV if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+
 git clone https://github.com/EternityForest/kaithem-scripts
 cd kaithem-scripts/docker
-
-
 
 ## Add needed user permissions
 
@@ -42,11 +47,7 @@ cd kaithem-scripts/docker
 
 
 
-# Install Docker however you prefer
-sudo apt install git docker.io docker-compose docker-cli
 
-# Install UV if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
 
 
 # OPTIONAL Enable system watchdog, prevent wifi sleep, other small tweaks
