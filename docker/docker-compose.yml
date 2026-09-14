@@ -54,16 +54,15 @@ services:
     network_mode: host
     pid: host
 
-    group_add:
-      - audio
-      - video
-      - dialout
 
-  kaithem-kiosk:
+  kiosk:
     # Started with xdg desktop after UI loads
     restart: "no"
     image: cooperskeep/kaithem-kiosk:0.96.0
-  
+    extends:
+      file: ./compose-groups.yml
+      service: groups
+
     cap_add:
       - SYS_NICE
     ulimits:
@@ -102,10 +101,6 @@ services:
 
     network_mode: host
 
-    group_add:
-      - audio
-      - video
-      - dialout
 
   matter:    
     image: ghcr.io/matter-js/matterjs-server:stable

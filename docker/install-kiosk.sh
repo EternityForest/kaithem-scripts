@@ -83,6 +83,6 @@ cat << EOF > $HOME/.config/autostart/kiosk.desktop
 [Desktop Entry]
 Name=EmberDefaultKiosk
 Type=Application
-Exec=sh -c "cd $HOME/kaithem-docker-home && KAITHEM_UID=$(id -u) KAITHEM_GROUP=$(id -g) KAITHEM_USER=$(id -un) docker compose up -f -d kiosk"
+Exec=sh -c "cd $HOME/kaithem-docker-home && KAITHEM_UID=$(id -u) KAITHEM_GROUP=$(id -g) KAITHEM_USER=$(id -un) docker compose up --remove-orphans -d kiosk"
 Terminal=false
 EOF
