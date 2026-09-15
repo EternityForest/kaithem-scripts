@@ -87,7 +87,7 @@ systemctl enable home-$(id -un $SD_PROTECT_UID)-.local-state-wireplumber.mount
 
 # Xsession errors is a big offender for wrecking down your disk with writes
 # It may still be written on Wayland!!!
-sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/dev\/null'/ /etc/X11/Xsession
+sed -i s/'ERRFILE=\$HOME\/\.xsession\-errors'/'ERRFILE\=\/dev\/shm\/xsession-errors'/ /etc/X11/Xsession
 
 
 

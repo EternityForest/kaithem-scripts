@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# These minimal utils are present in all the kaithem runtime images
+# To allow running the setup utils, and also for some extremely basic
+# debugging
+
+sudo apt install lsof htop fatrace nano ncdu iotop nethogs
