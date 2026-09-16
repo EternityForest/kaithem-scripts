@@ -1,7 +1,5 @@
 
-# Run with export KAITHEM_UID=$UID KAITHEM_GROUP=$GID KAITHEM_USER=$USER; sudo -E docker compose up
 services:
-  # This is the actual app, the rest are for testing
   kaithem:
     extends:
       file: ./compose-groups.yml
@@ -18,18 +16,18 @@ services:
 
     user: "${KAITHEM_UID:?error}:${KAITHEM_GROUP:?error}"
     environment:
-      - DISPLAY=${DISPLAY:-:0}
-      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
-      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-      - PIPEWIRE_REMOTE=pipewire-0
-      - USER=${KAITHEM_USER:?error}
-      - LOGNAME=${KAITHEM_USER:?error}
-      - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
-      - KAITHEM_AUDIO_API=jack
-      - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
-      - XAUTHORITY=${XAUTHORITY}
-      - PIPEWIRE_LATENCY="128/48000"
-      - PIPEWIRE_QUANTUM="128/48000"
+      DISPLAY: ${DISPLAY:-:0}
+      WAYLAND_DISPLAY: ${WAYLAND_DISPLAY:-wayland-0}
+      XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}
+      PIPEWIRE_REMOTE: pipewire-0
+      USER: ${KAITHEM_USER:?error}
+      LOGNAME: ${KAITHEM_USER:?error}
+      DBUS_SESSION_BUS_ADDRESS: ${DBUS_SESSION_BUS_ADDRESS}
+      KAITHEM_AUDIO_API: jack
+      XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}
+      XAUTHORITY: ${XAUTHORITY}
+      PIPEWIRE_LATENCY: "128/48000"
+      PIPEWIRE_QUANTUM: "128/48000"
 
     volumes:
       # Seems to be needed for getpass.getuser()
@@ -71,22 +69,25 @@ services:
     security_opt:
     - apparmor:unconfined
 
+    # For the GPU
+    privileged: true
+
     user: "${KAITHEM_UID:?error}:${KAITHEM_GROUP:?error}"
     environment:
-      - DISPLAY=${DISPLAY:-:0}
-      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
-      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
-      - PIPEWIRE_REMOTE=pipewire-0
-      - USER=${KAITHEM_USER:?error}
-      - HOME=/home/${KAITHEM_USER:?error}
-      - LOGNAME=${KAITHEM_USER:?error}
-      - DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}
-      - KAITHEM_AUDIO_API=jack
-      - XDG_SESSION_TYPE=${XDG_SESSION_TYPE}
-      - XAUTHORITY=${XAUTHORITY}
-      - PIPEWIRE_LATENCY="128/48000"
-      - PIPEWIRE_QUANTUM="128/48000"
-      - KIOSK_URL="${KIOSK_URL:-http://localhost:8002}"
+      DISPLAY: ${DISPLAY:-:0}
+      WAYLAND_DISPLAY: ${WAYLAND_DISPLAY:-wayland-0}
+      XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}
+      PIPEWIRE_REMOTE: pipewire-0
+      USER: ${KAITHEM_USER:?error}
+      HOME: /home/${KAITHEM_USER:?error}
+      LOGNAME: ${KAITHEM_USER:?error}
+      DBUS_SESSION_BUS_ADDRESS: ${DBUS_SESSION_BUS_ADDRESS}
+      KAITHEM_AUDIO_API: jack
+      XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}
+      XAUTHORITY: ${XAUTHORITY}
+      PIPEWIRE_LATENCY: "128/48000"
+      PIPEWIRE_QUANTUM: "128/48000"
+      KIOSK_URL: ${KIOSK_URL:-http://localhost:8002}
 
     volumes:
       - /var/run/dbus:/var/run/dbus
@@ -96,8 +97,6 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /usr/lib/locale:/usr/lib/locale:ro
 
-    tmpfs:
-      - /dev/shm:size=300M,mode=1777
 
     network_mode: host
 
@@ -111,8 +110,8 @@ services:
       - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
     
     environment:
-      - NOBLE_BINDINGS=dbus
-      - PRODUCTION_MODE=true
+      NOBLE_BINDINGS: dbus
+      PRODUCTION_MODE: true
 
     network_mode: host
     security_opt:

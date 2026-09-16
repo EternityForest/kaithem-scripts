@@ -11,6 +11,8 @@ mkdir -p ~/kaithem-docker-home
 mkdir -p ~/kaithem-docker-home/kaithem
 mkdir -p ~/kaithem-docker-home/matter
 
+echo "KIOSK_URL=http://localhost:8002" >> $HOME/kaithem-docker-home/.env
+
 
 #If file doesn't exist, create it
 if [ ! -f $HOME/kaithem-docker-home/docker-compose.yml ]; then
