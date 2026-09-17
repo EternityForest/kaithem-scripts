@@ -103,7 +103,7 @@ services:
 
 
   matter:    
-    image: ghcr.io/matter-js/matterjs-server:stable
+    image: ghcr.io/matter-js/matterjs-server:1.4.0
     volumes:
       - $HOME/kaithem-docker-home/matter:/app-home
       - /run/dbus:/run/dbus:ro
@@ -112,11 +112,16 @@ services:
     
     environment:
       NOBLE_BINDINGS: dbus
-      PRODUCTION_MODE: true
+      PRODUCTION_MODE: "true"
+      ENABLE_TIME_SYNC: "true"
+      ENABLE_TEST_NET_DCL: "true"
 
     network_mode: host
     security_opt:
       - apparmor:unconfined
     user: "${KAITHEM_UID}:${KAITHEM_GROUP}"
     restart: unless-stopped
-    command: --listen-address 127.0.0.1
+
+    # Bypass verifier to allow self-signed certs
+    command: >
+      --listen-address 127.0.0.1    
