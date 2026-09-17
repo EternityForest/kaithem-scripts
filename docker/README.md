@@ -6,8 +6,6 @@ For anything else, replace the apt-get commands with your equivalent.
 
 ```bash
 
-
-
 #Might need to remove some stuff on Raspi
 
 # sudo apt remove firefox rpi-imager python3-mypy python3-numpy rpi-userguide vlc evince
@@ -46,10 +44,6 @@ cd kaithem-scripts/docker
 
 
 
-
-
-
-
 # OPTIONAL Enable system watchdog, prevent wifi sleep, other small tweaks
 sudo bash ../debian/scripts/linux-tweaks.sh
 
@@ -80,7 +74,6 @@ bash install-kiosk.sh
 # Change where this kiosk actually points.
 # You will need to rerun the enable command to make it take effect
 #########################################################################
-
 
 
 # Actually launch. May take a while for first run

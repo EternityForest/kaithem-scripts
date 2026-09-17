@@ -60,6 +60,7 @@ services:
     extends:
       file: ./compose-groups.yml
       service: groups
+    pid: host
 
     cap_add:
       - SYS_NICE
