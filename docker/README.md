@@ -14,6 +14,12 @@ For anything else, replace the apt-get commands with your equivalent.
 # Rtkit sets up the rtkit group we need for real time audio.
 sudo apt install -y make git rtkit
 
+# Audio features require pipewire on the host to have these libraries
+# or the equivalent.  Your distro might already have this.
+sudo apt install -y pipewire-jack pipewire-audio-client-libraries
+systemctl --user restart pipewire wireplumber
+
+
 # Install Docker however you prefer
 sudo apt install -y docker.io docker-compose docker-cli
 
