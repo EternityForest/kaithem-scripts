@@ -95,3 +95,9 @@ bash enable.sh
 
 ```
 
+## Low Latency Audio
+
+On Pi4, PIPEWIRE_LATENCY and PIPEWIRE_QUANTUM must be  
+around the default 1024/48000 to avoid
+pops and crackles, but on faster platforms you can set these to
+128/48000 in kaithem-docker-home/docker-compose.yml

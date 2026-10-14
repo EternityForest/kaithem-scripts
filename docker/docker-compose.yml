@@ -26,8 +26,8 @@ services:
       KAITHEM_AUDIO_API: jack
       XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}
       XAUTHORITY: ${XAUTHORITY}
-      PIPEWIRE_LATENCY: "128/48000"
-      PIPEWIRE_QUANTUM: "128/48000"
+      PIPEWIRE_LATENCY: "1024/48000"
+      PIPEWIRE_QUANTUM: "1024/48000"
 
     volumes:
       # Seems to be needed for getpass.getuser()
@@ -86,8 +86,8 @@ services:
       KAITHEM_AUDIO_API: jack
       XDG_SESSION_TYPE: ${XDG_SESSION_TYPE}
       XAUTHORITY: ${XAUTHORITY}
-      PIPEWIRE_LATENCY: "128/48000"
-      PIPEWIRE_QUANTUM: "128/48000"
+      PIPEWIRE_LATENCY: "1024/48000"
+      PIPEWIRE_QUANTUM: "1024/48000"
       KIOSK_URL: ${KIOSK_URL:-http://localhost:8002}
 
     volumes:
