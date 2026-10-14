@@ -62,6 +62,10 @@ SD_PROTECT_UID=$(id -u) sudo -E ../debian/scripts/linux-sd-protect.sh
 # the user.
 ../debian/scripts/linux-sd-protect-user.sh
 
+## Fix pi setting itself to 40% volume at boot
+../debian/scripts/max-volume.sh
+
+
 # This will install kaithem-host-services, which runs
 # under systemd.  It can run as a normal user since we have added Docker.
 bash install.sh
